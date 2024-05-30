@@ -39,22 +39,29 @@ class MainWindow(QMainWindow):
         # position frames within widget
         self.main = QWidget()
         self.setMinimumSize(700, 500)
-        self.layout = QGridLayout(self.main)
+        self.layout = QVBoxLayout(self.main)
         self.setWindowTitle("Xyce Waveform Viewer")
         self.setCentralWidget(self.main)  # Set the main widget
         self.df = None
 
-        
+
+
+        self.splitter = QSplitter(Qt.Horizontal)        
+
         self.plot_window = Plot()
-        self.layout.addWidget(self.plot_window, 1, 1)
-        
         self.sidebar = Sidebar(self.plot_window)
-        self.layout.addWidget(self.sidebar, 1, 0)  # Add the sidebar to the layout
+
+        self.splitter.addWidget(self.sidebar)  # Add the sidebar to the layout
+        self.splitter.addWidget(self.plot_window)
         
-                
         self.utils = Utils(self.plot_window)
-        self.layout.addWidget(self.utils, 0, 0)  # Add the sidebar to the layout
+        self.layout.addWidget(self.utils)  # Add the sidebar to the layout
         self.utils.dataLoaded.connect(self.reloadSidebar)
+
+        self.layout.addWidget(self.splitter, 70)
+                
+
+
         
         if (len(sys.argv) > 1 and os.path.isfile(sys.argv[1])):
             self.utils.prnParser(sys.argv[1])
@@ -88,7 +95,8 @@ class MainWindow(QMainWindow):
     def reloadSidebar(self):
         self.sidebar.deleteLater()  # Delete the old sidebar
         self.sidebar = Sidebar(self.plot_window)  # Create a new sidebar
-        self.layout.addWidget(self.sidebar, 1, 0)  # Add the new sidebar to the layout
+        self.splitter.addWidget(self.sidebar)  # Add the new sidebar to the layout
+        self.splitter.addWidget(self.plot_window)
         
         
         
